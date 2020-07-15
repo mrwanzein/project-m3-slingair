@@ -82,7 +82,7 @@ p, a, li, blockquote, input {
     margin-bottom: var(--page-padding);
 }
 .flight-select input {
-    width: 125px;
+    width: 165px;
     margin-left: var(--page-padding);
 }
 
