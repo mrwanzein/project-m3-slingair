@@ -98,12 +98,20 @@ const handleConfirmSeat = (event) => {
     fetch('/users', {
         method: 'POST',
         body: JSON.stringify({
-            'givenName': document.getElementById('givenName').value
+            'givenName': document.getElementById('givenName').value,
+            'surname': document.getElementById('surname').value,
+            'email': document.getElementById('email').value,
+            'flight': flightInput.value,
+            'seat': document.getElementsByClassName('selected')[0].textContent
         }),
         headers: {
             'Accept': 'application/json',
             "Content-Type": "application/json"
         }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data) window.location.href = "/view-reservation";
     })
 
 }

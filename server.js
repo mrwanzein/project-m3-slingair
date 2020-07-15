@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const { flights } = require('./test-data/flightSeating');
 
+let userInfo;
+
 /* ↓----------------------- Handlers functions -------------------------------------------------------↓ */
 const handleFlightNumber = (req, res) => {
   const {flightNumber} = req.params;
@@ -23,9 +25,27 @@ const handleAvailableFlights = (req, res) => {
   if(flights){
     res.status(200).send(flights);
   } else {
-    res.status(400).send('Cannot find ressourse');
+    res.status(404).send('Cannot find ressourse');
   }
-} 
+}
+
+const handleForm = (req, res) => {
+
+  if(flights){
+    userInfo = req.body;
+    res.status(200).send(req.body);
+  } else {
+    res.status(400).send('Enter correct input in correct fields');
+  }
+}
+
+const sendUserInfo = (req, res) => {
+  if(userInfo){
+    res.status(200).send(userInfo);
+  } else {
+    res.status(404).send('Cannot find ressource');
+  }
+}
 
 /* ↑----------------------- Handlers functions -------------------------------------------------------↑ */ 
 
@@ -47,6 +67,8 @@ express()
   // endpoints
   .get('/flights/:flightNumber', handleFlightNumber)
   .get('/available-flights', handleAvailableFlights)
+  .post('/users', handleForm)
+  .get('/get-user-info', sendUserInfo)
 
   .use((req, res) => res.send('Not Found'))
   .listen(8000, () => console.log(`Listening on port 8000`));
