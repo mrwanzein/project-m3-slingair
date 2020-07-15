@@ -1,6 +1,7 @@
 const flightInput = document.getElementById('flight');
 const seatsDiv = document.getElementById('seats-section');
 const confirmButton = document.getElementById('confirm-button');
+const getFlightButton = document.getElementById('get-flight');
 
 const availableFlightOptions = document.getElementsByTagName('datalist')[0];
 
@@ -28,7 +29,7 @@ const renderSeats = (unvailableSeatsIds) => {
     document.querySelector('.form-container').style.display = 'block';
     while (seatsDiv.firstChild) {
         seatsDiv.removeChild(seatsDiv.lastChild);
-      }
+    }
 
     const alpha = ['A', 'B', 'C', 'D', 'E', 'F'];
     for (let r = 1; r < 11; r++) {
@@ -107,4 +108,4 @@ const handleConfirmSeat = (event) => {
 
 }
 
-flightInput.addEventListener('blur', toggleFormContent);
+getFlightButton.addEventListener('click', toggleFormContent);

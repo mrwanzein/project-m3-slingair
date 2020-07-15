@@ -238,6 +238,7 @@ input {
     height: 48px;
     min-width: 48%;
 }
+
 .button.confirm {
     background: var(--alabama-crimson);
     border-color: transparent;
@@ -260,3 +261,11 @@ input {
 }
 
 .form-container { display: none; }
+
+.get-flight {
+    height: 40px;
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+}
