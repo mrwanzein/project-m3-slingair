@@ -3,7 +3,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const { v4: uuidv4 } = require('uuid');
+
 const { flights } = require('./test-data/flightSeating');
+const { reservations } = require('./test-data/reservations');
 
 let userInfo;
 
@@ -33,7 +36,13 @@ const handleForm = (req, res) => {
 
   if(flights){
     userInfo = req.body;
-    res.status(200).send(req.body);
+    userInfo.id = uuidv4();
+    reservations.push(userInfo);
+
+    // To test ids of other users
+    console.log(reservations)
+
+    res.status(200).send(userInfo);
   } else {
     res.status(400).send('Enter correct input in correct fields');
   }
@@ -44,6 +53,19 @@ const sendUserInfo = (req, res) => {
     res.status(200).send(userInfo);
   } else {
     res.status(404).send('Cannot find ressource');
+  }
+}
+
+const viewUserFlightWithId = (req, res) => {
+  const {id} = req.params;
+  
+  const user = reservations.find(user => user.id === id);
+  userInfo = user
+  
+  if(user){
+    res.status(200).redirect('/view-reservation');
+  } else {
+    res.status(400).send('Cannot find user');
   }
 }
 
@@ -69,6 +91,7 @@ express()
   .get('/available-flights', handleAvailableFlights)
   .post('/users', handleForm)
   .get('/get-user-info', sendUserInfo)
+  .get('/view-reservation/:id', viewUserFlightWithId)
 
   .use((req, res) => res.send('Not Found'))
   .listen(8000, () => console.log(`Listening on port 8000`));
