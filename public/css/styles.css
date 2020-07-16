@@ -34,7 +34,7 @@ main {
     justify-content: space-around;
     align-items: center;
     width: 800px;
-    margin: 0 auto;
+    margin: 150px auto;
 }
 .content.confirmation {
     margin: 200px auto 120px;
