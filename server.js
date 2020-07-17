@@ -4,48 +4,95 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const { v4: uuidv4 } = require('uuid');
-
-const { flights } = require('./test-data/flightSeating');
-const { reservations } = require('./test-data/reservations');
+const rp = require('request-promise');
+const journeyAPIurl = 'https://journeyedu.herokuapp.com';
 
 let userInfo;
+
+// ↓Fetch functions to journeyedu.herokuapp.com API↓
+const getUsersFromDB = () => {
+  return rp(`${journeyAPIurl}/slingair/users`)
+  .then(data => JSON.parse(data))
+  .catch(err => console.log(err));
+}
+
+const getFlightsFromDB = () => {
+  return rp(`${journeyAPIurl}/slingair/flights`)
+  .then(data => JSON.parse(data).flights)
+  .catch(err => console.log(err));
+}
+
+const getSpecificFlightsFromDB = (flightNum) => {
+  return rp(`${journeyAPIurl}/slingair/flights/${flightNum}`)
+  .then(data => JSON.parse(data)[flightNum])
+  .catch(err => console.log(err));
+}
+
+const addReservationToDB = (userPayLoad) => {
+  const { email, flight, givenName, id, seat, surname } = userPayLoad;
+
+  return rp({
+    method: 'POST',
+    uri: `${journeyAPIurl}/slingair/users`,
+    body: {
+      email,
+      flight,
+      givenName,
+      id,
+      seat,
+      surname
+    },
+    json: true // Automatically stringifies the body to JSON
+  })
+}
+// ↑Fetch functions to journeyedu.herokuapp.com API↑
 
 /* ↓----------------------- Handlers functions -------------------------------------------------------↓ */
 const handleFlightNumber = (req, res) => {
   const {flightNumber} = req.params;
   const regEx = /(SA)\d{3}/;
 
-  if(flightNumber.match(regEx)){
-    const selectedFlight = flights[flightNumber];
-    res.status(200).send(selectedFlight);
-  } else {
-    res.status(400).send('Invalid flight number or flight is unavailable');
-  }
+    if(flightNumber.match(regEx)){
+      getSpecificFlightsFromDB(flightNumber)
+      .then(flightSeatData => {
+        res.status(200).send(flightSeatData);
+      })
+    } else {
+      res.status(400).send('Invalid flight number or flight is unavailable');
+    }
+  
 }
 
 const handleAvailableFlights = (req, res) => {
+  getFlightsFromDB()
+  .then(data => {
+    if(data){
+      res.status(200).send(data);
+    } else {
+      res.status(404).send('Cannot find ressourse');
+    }
+  })
+  .catch(err => console.log(err));
 
-  if(flights){
-    res.status(200).send(flights);
-  } else {
-    res.status(404).send('Cannot find ressourse');
-  }
 }
 
 const handleForm = (req, res) => {
 
-  if(flights){
-    userInfo = req.body;
-    userInfo.id = uuidv4();
-    reservations.push(userInfo);
+  getUsersFromDB()
+  .then(data => {
+    if(data) {
+      userInfo = req.body;
+      userInfo.id = uuidv4();
+      res.status(200).send(userInfo);
+    } else {
+      res.status(400).send('Enter correct input in correct fields');
+    }
+  })
+  .then(() => {
+    return addReservationToDB(userInfo);
+  })
+  .catch(err => console.log(err));
 
-    // To test ids of other users
-    console.log(reservations)
-
-    res.status(200).send(userInfo);
-  } else {
-    res.status(400).send('Enter correct input in correct fields');
-  }
 }
 
 const sendUserInfo = (req, res) => {
@@ -59,18 +106,21 @@ const sendUserInfo = (req, res) => {
 const viewUserFlightWithEmail = (req, res) => {
   const {email} = req.params;
   
-  const user = reservations.find(user => user.email === email);
-  userInfo = user
-  
-  if(user){
-    res.status(200).redirect('/view-reservation');
-  } else {
-    res.status(400).send('Cannot find user');
-  }
+  getUsersFromDB()
+  .then(listOfUsers => listOfUsers.find(user => user.email === email))
+  .then(user => userInfo = user)
+  .then(() => {
+      if(userInfo){
+        res.status(200).redirect('/view-reservation');
+      } else {
+        res.status(400).send('Cannot find user');
+      }
+    }
+  )
+  .catch(err => console.log(err))
 }
 
 /* ↑----------------------- Handlers functions -------------------------------------------------------↑ */ 
-
 
 express()
   .use(function (req, res, next) {

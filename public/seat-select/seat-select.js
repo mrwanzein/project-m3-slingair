@@ -8,12 +8,12 @@ const getReservationWithEmail = document.getElementById('get-flight-reservation'
 const availableFlightOptions = document.getElementsByTagName('datalist')[0];
 
 // fetching the available flights for the input list
-const getAvailableFlights = async () => {
-    await fetch('/available-flights')
+const getAvailableFlights = () => {
+    return fetch('/available-flights')
     .then(res => res.json())
     .then(data => {
         // Make the available flight input a list of available flights
-        Object.keys(data).forEach(flightNumber => {
+        data.forEach(flightNumber => {
             let input = document.createElement('option');
             input.setAttribute('value', `${flightNumber}`)
             availableFlightOptions.append(input);
