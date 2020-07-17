@@ -2,6 +2,8 @@ const flightInput = document.getElementById('flight');
 const seatsDiv = document.getElementById('seats-section');
 const confirmButton = document.getElementById('confirm-button');
 const getFlightButton = document.getElementById('get-flight');
+const getUserEmail = document.getElementById('email-for-reservation');
+const getReservationWithEmail = document.getElementById('get-flight-reservation');
 
 const availableFlightOptions = document.getElementsByTagName('datalist')[0];
 
@@ -21,6 +23,10 @@ const getAvailableFlights = async () => {
 }
 
 getAvailableFlights();
+
+const viewFlightWithEmail = () => {
+    window.location.href = `/view-reservation/${getUserEmail.value}`;
+}
 
 let selection = '';
 
@@ -117,3 +123,4 @@ const handleConfirmSeat = (event) => {
 }
 
 getFlightButton.addEventListener('click', toggleFormContent);
+getReservationWithEmail.addEventListener('click', viewFlightWithEmail);

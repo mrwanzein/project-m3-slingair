@@ -56,10 +56,10 @@ const sendUserInfo = (req, res) => {
   }
 }
 
-const viewUserFlightWithId = (req, res) => {
-  const {id} = req.params;
+const viewUserFlightWithEmail = (req, res) => {
+  const {email} = req.params;
   
-  const user = reservations.find(user => user.id === id);
+  const user = reservations.find(user => user.email === email);
   userInfo = user
   
   if(user){
@@ -91,7 +91,7 @@ express()
   .get('/available-flights', handleAvailableFlights)
   .post('/users', handleForm)
   .get('/get-user-info', sendUserInfo)
-  .get('/view-reservation/:id', viewUserFlightWithId)
+  .get('/view-reservation/:email', viewUserFlightWithEmail)
 
   .use((req, res) => res.send('Not Found'))
   .listen(8000, () => console.log(`Listening on port 8000`));
